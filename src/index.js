@@ -4,7 +4,7 @@ import './index.css';
 
 function Square(props) {
     return (
-        <button className="square" onClick={props.onClick}>
+        <button className="square" onClick={props.myCustomEventFunction}>
             {props.value}
         </button>
     );
@@ -15,7 +15,7 @@ class Board extends React.Component {
         return (
             <Square
                 value={this.props.squares[i]}
-                onClick={() => this.props.onClick(i)}
+                myCustomEventFunction={() => this.props.onClick(i)}
             />
         );
     }
@@ -51,7 +51,7 @@ class Game extends React.Component {
                 squares: Array(9).fill(null),
             }],
             stepNumber: 0,
-            xIsNext: true,
+            nextPlayer: 'X',
         };
     }
 
@@ -64,20 +64,21 @@ class Game extends React.Component {
         if (calculateWinner(squares) || squares[i]) {
             return; // is this a safety lock?
         }
-        squares[i] = this.state.xIsNext ? 'X' : 'O';
+        squares[i] = this.state.nextPlayer;
+
         this.setState({
             history: history.concat([{
                 squares: squares,
             }]),
             stepNumber: history.length,
-            xIsNext: !this.state.xIsNext
+            nextPlayer: (this.state.nextPlayer === 'X' ? 'O' : 'X')
         });
     }
 
     jumpTo(step) {
         this.setState({
             stepNumber: step,
-            xIsNext: (step % 2) === 0
+            nextPlayer: ((step % 2) === 0 ? 'X' : 'O')
         });
 
     }
@@ -104,7 +105,7 @@ class Game extends React.Component {
         if (winner) {
             status = 'Winner: ' + winner;
         } else {
-            status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+            status = 'Next player: ' + (this.state.nextPlayer);
         }
 
         return (
